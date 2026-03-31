@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { WebPubSubClient } from '@azure/web-pubsub-client'
 import config from './config'
 
-function BreakfastPrep({ order, onBack }) {
+function BreakfastPrep({ order, onBack, isDefault = false }) {
   const [prepMode, setPrepMode] = useState('async')
   const [events, setEvents] = useState([])
   const [preparing, setPreparing] = useState(false)
@@ -87,6 +87,20 @@ function BreakfastPrep({ order, onBack }) {
 
   return (
     <div className="card">
+{isDefault && (
+  <div style={{
+    background: '#fef9c3',
+    border: '1px solid #fde68a',
+    color: '#92400e',
+    padding: '0.6rem 1rem',
+    borderRadius: '6px',
+    fontSize: '0.85rem',
+    marginBottom: '1.25rem'
+  }}>
+    Showing default breakfast — place an order first to customize.
+  </div>
+)}
+
       <h2>Prepare My Breakfast</h2>
       <p style={{ color: '#64748b', marginBottom: '1.25rem' }}>
         Choose how the kitchen prepares your order and watch it happen in real time.
