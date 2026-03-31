@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import config from './config'
 
-function BreakfastOrder() {
+function BreakfastOrder({ onOrderConfirmed }) {
   const [order, setOrder] = useState({
     drink: 'coffee',
     coffeeType: 'regular',
@@ -12,17 +13,42 @@ function BreakfastOrder() {
   })
 
   const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [confirmation, setConfirmation] = useState(null)
+  const [error, setError] = useState(null)
 
   const handleChange = (field, value) => {
     setOrder(prev => ({ ...prev, [field]: value }))
   }
 
-  const handleSubmit = () => {
-    setSubmitted(true)
+  const handleSubmit = async () => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/api/BreakfastOrder`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(order)
+      })
+
+      if (!response.ok) throw new Error('Order failed')
+
+      const data = await response.json()
+      setConfirmation(data)
+      setSubmitted(true)
+
+    } catch (err) {
+      setError('Could not reach the kitchen. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleReset = () => {
     setSubmitted(false)
+    setConfirmation(null)
+    setError(null)
     setOrder({
       drink: 'coffee',
       coffeeType: 'regular',
@@ -34,40 +60,69 @@ function BreakfastOrder() {
     })
   }
 
-  if (submitted) {
+  if (submitted && confirmation) {
     return (
       <div className="card">
-        <h2>✅ Order Confirmed!</h2>
-        <p style={{ marginBottom: '1rem' }}>Here's what's coming up:</p>
+        <h2>Order Confirmed!</h2>
+        <p style={{ marginBottom: '0.5rem', color: '#64748b' }}>
+          Order #{confirmation.orderId} · Est. {confirmation.estimatedTime}
+        </p>
         <div className="order-summary">
           <div className="summary-item">
-            ☕ {order.drink === 'coffee' ? `Coffee (${order.coffeeType})` : 'Tea'}
+            {confirmation.drink === 'coffee'
+              ? `Coffee (${confirmation.coffeeType})`
+              : 'Tea'}
           </div>
-          {order.juice !== 'none' && (
-            <div className="summary-item">🥤 {order.juice} juice</div>
+          {confirmation.juice !== 'none' && (
+            <div className="summary-item">{confirmation.juice} juice</div>
           )}
-          <div className="summary-item">🍳 Eggs — {order.eggs}</div>
-          <div className="summary-item">🥓 {order.meat}</div>
-          {order.toast && <div className="summary-item">🍞 Toast</div>}
-          {order.notes && (
-            <div className="summary-item">📝 Note: {order.notes}</div>
+          <div className="summary-item">Eggs — {confirmation.eggs}</div>
+          {confirmation.meat !== 'none' && (
+            <div className="summary-item">{confirmation.meat}</div>
+          )}
+          {confirmation.toast && (
+            <div className="summary-item">Toast</div>
+          )}
+          {confirmation.notes && (
+            <div className="summary-item">Note: {confirmation.notes}</div>
           )}
         </div>
-        <button className="btn-primary" onClick={handleReset}>
-          Place Another Order
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <button className="btn-primary" onClick={handleReset}>
+            Place Another Order
+          </button>
+          <button
+          className="btn-secondary"
+          onClick={() => onOrderConfirmed(confirmation)}
+        >
+          Prepare My Breakfast →
         </button>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="card">
-      <h2>🍳 Place Your Order</h2>
+      <h2>Place Your Order</h2>
       <p>Build your perfect breakfast below.</p>
+
+      {error && (
+        <div style={{
+          background: '#fef2f2',
+          border: '1px solid #fecaca',
+          color: '#991b1b',
+          padding: '0.75rem 1rem',
+          borderRadius: '6px',
+          marginTop: '1rem',
+          fontSize: '0.9rem'
+        }}>
+          {error}
+        </div>
+      )}
 
       <div className="form-section">
 
-        {/* Drink */}
         <div className="form-group">
           <label className="form-label">Drink</label>
           <div className="radio-group">
@@ -86,7 +141,6 @@ function BreakfastOrder() {
           </div>
         </div>
 
-        {/* Coffee type — only shows if coffee selected */}
         {order.drink === 'coffee' && (
           <div className="form-group">
             <label className="form-label">Coffee type</label>
@@ -102,7 +156,6 @@ function BreakfastOrder() {
           </div>
         )}
 
-        {/* Juice */}
         <div className="form-group">
           <label className="form-label">Juice</label>
           <select
@@ -118,7 +171,6 @@ function BreakfastOrder() {
           </select>
         </div>
 
-        {/* Eggs */}
         <div className="form-group">
           <label className="form-label">Eggs</label>
           <div className="radio-group">
@@ -137,7 +189,6 @@ function BreakfastOrder() {
           </div>
         </div>
 
-        {/* Meat */}
         <div className="form-group">
           <label className="form-label">Meat</label>
           <div className="radio-group">
@@ -156,7 +207,6 @@ function BreakfastOrder() {
           </div>
         </div>
 
-        {/* Toast */}
         <div className="form-group">
           <label className="checkbox-label">
             <input
@@ -168,7 +218,6 @@ function BreakfastOrder() {
           </label>
         </div>
 
-        {/* Notes */}
         <div className="form-group">
           <label className="form-label">Special requests</label>
           <textarea
@@ -180,8 +229,12 @@ function BreakfastOrder() {
           />
         </div>
 
-        <button className="btn-primary" onClick={handleSubmit}>
-          Place Order →
+        <button
+          className="btn-primary"
+          onClick={handleSubmit}
+          disabled={loading}
+        >
+          {loading ? 'Placing order...' : 'Place Order →'}
         </button>
 
       </div>
