@@ -63,22 +63,10 @@ function BreakfastOrder({ onOrderConfirmed }) {
   if (submitted && confirmation) {
     return (
       <div className="card">
-        <div style={{
-          background: '#d1fae5',
-          border: '1px solid #6ee7b7',
-          color: '#065f46',
-          padding: '1rem 1.25rem',
-          borderRadius: '8px',
-          marginBottom: '1.25rem',
-          textAlign: 'center'
-        }}>
-          <div style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '0.25rem' }}>
-            ✅ Order Confirmed!
-          </div>
-          <div style={{ fontSize: '0.9rem', opacity: 0.85 }}>
-            Order #{confirmation.orderId} &nbsp;·&nbsp; Est. {confirmation.estimatedTime}
-          </div>
-        </div>
+        <h2>Order Confirmed!</h2>
+        <p style={{ marginBottom: '0.5rem', color: '#64748b' }}>
+          Order #{confirmation.orderId} · Est. {confirmation.estimatedTime}
+        </p>
         <div className="order-summary">
           <div className="summary-item">
             {confirmation.drink === 'coffee'
@@ -104,11 +92,11 @@ function BreakfastOrder({ onOrderConfirmed }) {
             Place Another Order
           </button>
           <button
-            className="btn-secondary"
-            onClick={() => onOrderConfirmed(confirmation)}
-          >
-            Prepare My Breakfast →
-          </button>
+          className="btn-secondary"
+          onClick={() => onOrderConfirmed(confirmation)}
+        >
+          Prepare My Breakfast →
+        </button>
         </div>
       </div>
     )
