@@ -99,15 +99,28 @@ function BreakfastOrder({ onOrderConfirmed }) {
             <div className="summary-item">Note: {confirmation.notes}</div>
           )}
         </div>
+        <div style={{
+          background: '#fffbeb',
+          border: '1px solid #fcd34d',
+          color: '#92400e',
+          padding: '0.6rem 1rem',
+          borderRadius: '6px',
+          marginBottom: '1rem',
+          fontSize: '0.88rem',
+          fontWeight: '500',
+          textAlign: 'center'
+        }}>
+          👇 Click <strong>Prepare My Breakfast</strong> to see the next step
+        </div>
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <button className="btn-primary" onClick={handleReset}>
-            Place Another Order
-          </button>
           <button
-            className="btn-secondary"
+            className="btn-primary"
             onClick={() => onOrderConfirmed(confirmation)}
           >
             Prepare My Breakfast →
+          </button>
+          <button className="btn-secondary" onClick={handleReset}>
+            Place Another Order
           </button>
         </div>
       </div>
@@ -118,6 +131,20 @@ function BreakfastOrder({ onOrderConfirmed }) {
     <div className="card">
       <h2>Place Your Order</h2>
       <p>Build your perfect breakfast below.</p>
+
+      <div style={{
+        background: '#f0f9ff',
+        border: '1px solid #bae6fd',
+        color: '#0369a1',
+        padding: '0.6rem 1rem',
+        borderRadius: '6px',
+        marginTop: '0.75rem',
+        fontSize: '0.88rem',
+        fontWeight: '500',
+        textAlign: 'center'
+      }}>
+        👆 Select your breakfast choices below
+      </div>
 
       {error && (
         <div style={{
