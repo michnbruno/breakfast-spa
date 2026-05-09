@@ -118,6 +118,7 @@ function App() {
             isDefault={currentOrder.orderId === 'DEFAULT'}
           />
         )}
+
         {activeView === 'upload' && (
           <div className="card">
             <h2>📁 File Upload</h2>
